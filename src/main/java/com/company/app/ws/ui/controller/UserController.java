@@ -1,19 +1,16 @@
 package com.company.app.ws.ui.controller;
 
+import com.company.app.ws.exceptions.UserServiceException;
+import com.company.app.ws.ui.model.response.ErrorMessages;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import com.company.app.ws.service.UserService;
 import com.company.app.ws.shared.dto.UserDto;
 import com.company.app.ws.ui.model.request.UserDetailsRequest;
 import com.company.app.ws.ui.model.response.UserDetailsResponse;
+
 
 @RestController
 @RequestMapping("users")
@@ -22,22 +19,25 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping
-    public UserDetailsResponse getUser(@RequestBody UserDetailsRequest userDetails) {
+    @GetMapping(path = "/{id}",
+            produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+    public UserDetailsResponse getUser(@PathVariable String id) {
         UserDetailsResponse returnedUser = new UserDetailsResponse();
 
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(userDetails, userDto);
-
-        UserDto createdUser = userService.getUser(userDto.getEmail());
-        BeanUtils.copyProperties(createdUser, returnedUser);
+        UserDto userDto = userService.getUserById(id);
+        BeanUtils.copyProperties(userDto, returnedUser);
 
         return returnedUser;
     }
 
-    @PostMapping
-    public UserDetailsResponse createUser(@RequestBody UserDetailsRequest userDetails) {
+    @PostMapping(
+            consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
+            produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }
+            )
+    public UserDetailsResponse createUser(@RequestBody UserDetailsRequest userDetails) throws Exception{
         UserDetailsResponse returnedUser = new UserDetailsResponse();
+
+        if(userDetails.getEmail().isEmpty()) throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 
         UserDto userDto = new UserDto();
         BeanUtils.copyProperties(userDetails, userDto);

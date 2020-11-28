@@ -46,6 +46,18 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public UserDto getUserById(String id) {
+        UserDto returnValue = new UserDto();
+        try {
+            UserEntity userEntity = userRepository.findById(id);
+            BeanUtils.copyProperties(userEntity, returnValue);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+        }
+        return returnValue;
+    }
+
+    @Override
     public UserDto getUser(String email) {
         UserDto returnValue = new UserDto();
         try {
