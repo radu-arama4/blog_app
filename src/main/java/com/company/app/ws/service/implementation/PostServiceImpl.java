@@ -7,7 +7,8 @@ import com.company.app.ws.shared.dto.PostDto;
 import com.company.app.ws.shared.dto.UpdatedPostDto;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.company.app.ws.service.PostService;
@@ -26,13 +27,17 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto createPost(PostDto post) {
-        if(postsRepository.findByTitleAndUserId(post.getTitle(), post.getUserId())!=null){
+        Authentication principal = SecurityContextHolder.getContext().getAuthentication();
+        String currentId = userRepository.findByEmail(principal.getName()).getId();
+
+        if(postsRepository.findByTitleAndUserId(post.getTitle(), currentId)!=null){
             throw new RuntimeException("Already existing a post with this title!");
         }
 
         PostEntity postEntity = new PostEntity();
         BeanUtils.copyProperties(post, postEntity);
 
+        postEntity.setUser(userRepository.findByEmail(principal.getName()));
         postEntity.setId(UUID.randomUUID().toString());
 
         PostEntity storedPost = postsRepository.save(postEntity);
@@ -72,12 +77,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto updatePost(UpdatedPostDto post) {
-        if(postsRepository.findByTitleAndUserId(post.getTitle(), post.getUserId())==null){
+        Authentication principal = SecurityContextHolder.getContext().getAuthentication();
+        String currentId = userRepository.findByEmail(principal.getName()).getId();
+
+        if(postsRepository.findByTitleAndUserId(post.getTitle(), currentId)==null){
             throw new RuntimeException("Not existing such user or post!");
         }
 
         PostDto returnedPost = new PostDto();
-        PostEntity foundPost = postsRepository.findByTitleAndUserId(post.getTitle(), post.getUserId());
+        PostEntity foundPost = postsRepository.findByTitleAndUserId(post.getTitle(), currentId);
 
         if(post.getNewContent()!=null){
             foundPost.setContent(post.getNewContent());
@@ -95,11 +103,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public String deletePost(PostDto post) {
-        if(postsRepository.findByTitleAndUserId(post.getTitle(), post.getUserId())==null){
+        Authentication principal = SecurityContextHolder.getContext().getAuthentication();
+        String currentId = userRepository.findByEmail(principal.getName()).getId();
+
+        if(postsRepository.findByTitleAndUserId(post.getTitle(), currentId)==null){
             throw new RuntimeException("Not existing such user or post!");
         }
         String title;
-        PostEntity deletedPost = postsRepository.findByTitleAndUserId(post.getTitle(), post.getUserId());
+        PostEntity deletedPost = postsRepository.findByTitleAndUserId(post.getTitle(), currentId);
         title = deletedPost.getTitle();
         postsRepository.delete(deletedPost);
 

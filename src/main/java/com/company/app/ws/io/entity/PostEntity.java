@@ -2,10 +2,7 @@ package com.company.app.ws.io.entity;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity(name = "posts")
@@ -16,8 +13,9 @@ public class PostEntity implements Serializable {
     @GenericGenerator(name="system-uuid", strategy = "uuid")
     private String id;
 
-    @Column
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private UserEntity user;
 
     @Column
     private String title;
@@ -31,14 +29,6 @@ public class PostEntity implements Serializable {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public String getTitle() {
@@ -55,5 +45,13 @@ public class PostEntity implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 }

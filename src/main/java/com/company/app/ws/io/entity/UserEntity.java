@@ -3,11 +3,9 @@ package com.company.app.ws.io.entity;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity(name = "users")
 public class UserEntity implements Serializable {
@@ -36,6 +34,9 @@ public class UserEntity implements Serializable {
 
     @Column(nullable = false)
     private boolean privateOrNot;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PostEntity> posts;
 
     public boolean isPrivateOrNot() {
         return privateOrNot;
@@ -91,6 +92,14 @@ public class UserEntity implements Serializable {
 
     public void setEncryptedPassword(String encryptedPassword) {
         this.encryptedPassword = encryptedPassword;
+    }
+
+    public List<PostEntity> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<PostEntity> posts) {
+        this.posts = posts;
     }
 
     public static long getSerialversionuid() {

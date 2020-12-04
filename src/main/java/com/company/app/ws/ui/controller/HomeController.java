@@ -3,7 +3,7 @@ package com.company.app.ws.ui.controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/noroc")
+@RequestMapping("/home")
 public class HomeController {
 
     @GetMapping
