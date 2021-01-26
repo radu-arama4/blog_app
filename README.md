@@ -1,5 +1,5 @@
 # blog_app
-Personal project wich represents an application that you can use to create your personal account, make your posts and also view other persons posts. 
+Personal project which is an application that you can use to create your personal account, make your posts and also view other persons posts. 
 
 Project done using Spring Boot. 
 
